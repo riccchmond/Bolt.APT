@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Javelin Coach</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .log-container {
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+        }
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">
+                <i class="fas fa-running mr-3"></i>AI Javelin Coach
+            </h1>
+            <p class="text-white/80 text-lg">Upload your throw, get personalized coaching</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Section 1: Upload -->
+            <div class="glass-effect rounded-xl p-6">
+                <h2 class="text-xl font-semibold text-white mb-4">
+                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-2">1</span>
+                    Upload Your Throw
+                </h2>
+                
+                <form id="uploadForm" class="space-y-4">
+                    <!-- Video Upload -->
+                    <div>
+                        <label class="block text-white/90 text-sm font-medium mb-2">
+                            <i class="fas fa-video mr-2"></i>Video File
+                        </label>
+                        <div class="relative">
+                            <input type="file" id="videoFile" accept="video/*" 
+                                   class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        </div>
+                        <div id="videoPreview" class="mt-2 hidden">
+                            <video class="w-full h-32 object-cover rounded-lg" controls></video>
+                            <p class="text-white/70 text-xs mt-1" id="fileInfo"></p>
+                        </div>
+                    </div>
+
+                    <!-- Height Input -->
+                    <div>
+                        <label class="block text-white/90 text-sm font-medium mb-2">
+                            <i class="fas fa-ruler-vertical mr-2"></i>Height (meters)
+                        </label>
+                        <input type="number" id="height" step="0.01" min="1.0" max="2.5" placeholder="1.75"
+                               class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+
+                    <!-- Weight Input -->
+                    <div>
+                        <label class="block text-white/90 text-sm font-medium mb-2">
+                            <i class="fas fa-weight mr-2"></i>Weight (kg)
+                        </label>
+                        <input type="number" id="weight" step="0.1" min="40" max="150" placeholder="70"
+                               class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+
+                    <!-- Analyze Button -->
+                    <button type="submit" id="analyzeBtn" disabled
+                            class="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+                        <span id="btnText">
+                            <i class="fas fa-play mr-2"></i>Analyze Throw
+                        </span>
+                        <span id="btnSpinner" class="hidden">
+                            <i class="fas fa-spinner spinner mr-2"></i>Analyzing...
+                        </span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Section 2: Live Analysis Log -->
+            <div class="glass-effect rounded-xl p-6">
+                <h2 class="text-xl font-semibold text-white mb-4">
+                    <span class="bg-green-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-2">2</span>
+                    Live Analysis Log
+                </h2>
+                
+                <div class="log-container bg-black/30 rounded-lg p-4 text-green-400 text-sm">
+                    <div id="logOutput">
+                        <div class="text-white/50">Waiting for analysis to start...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: AI Coach -->
+            <div class="glass-effect rounded-xl p-6">
+                <h2 class="text-xl font-semibold text-white mb-4">
+                    <span class="bg-purple-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-2">3</span>
+                    Your AI Coach
+                </h2>
+                
+                <div id="coachSection">
+                    <div id="waitingForCoach" class="text-center text-white/70">
+                        <i class="fas fa-user-tie text-4xl mb-3 opacity-50"></i>
+                        <p>Your personalized coaching video will appear here after analysis</p>
+                    </div>
+                    
+                    <div id="coachResults" class="hidden">
+                        <div id="analysisResults" class="mb-4 p-4 bg-white/10 rounded-lg">
+                            <!-- Analysis results will be inserted here -->
+                        </div>
+                        <div id="coachVideo">
+                            <!-- Tavus video will be embedded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 text-white/60">
+            <p>Powered by AI • MediaPipe • Tavus.io</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
